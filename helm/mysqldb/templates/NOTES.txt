@@ -1,0 +1,15 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To get your root password run:
+
+    kubectl get secret --namespace {{ .Release.Namespace }} {{ .Release.Name }}-mysql-secret -o jsonpath="{.data.mysql-root-password}" | base64 --decode
+
+To connect to your database:
+
+1. Run a pod that you can use as a client:
+    kubectl run -i --tty --rm debug --image=mysql:8.0 --restart=Never -- bash
+
+2. Connect using the mysql cli, then enter the password:
+    mysql -h {{ .Release.Name }}-mysql -p
