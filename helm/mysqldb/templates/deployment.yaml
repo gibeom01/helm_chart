@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mysqldb.fullname" . }}
+  labels:
+    {{- include "mysqldb.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "mysqldb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mysqldb.selectorLabels" . | nindent 8 }}
+    spec:
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      serviceAccountName: {{ include "mysqldb.serviceAccountName" . }}  # ServiceAccount 연결
+      initContainers:
+        - name: clean-mysqldb
+          image: busybox:1.35
+          command: ["sh", "-c", "rm -rf /var/lib/mysql/*"]
+          volumeMounts:
+            - name: mysqldb-persistent-storage
+              mountPath: /var/lib/mysql
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "public.ecr.aws/docker/library/mysql:8.0"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql-secret
+                  key: rootPassword
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.database | quote }}
+            - name: MYSQL_USER
+              value: {{ .Values.mysql.user | quote }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql-secret
+                  key: password
+            - name: MYSQL_ROOT_HOST
+              value: {{ .Values.mysql.rootHost | quote }}
+          volumeMounts:
+            - name: mysqldb-persistent-storage
+              mountPath: /var/lib/mysql
+            - name: init-mysqldb-script
+              mountPath: /docker-entrypoint-initdb.d/createDB.sql
+              subPath: createDB.sql
+          ports:
+            - containerPort: 3306
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - "-u"
+                - root
+                - "-p$(MYSQL_ROOT_PASSWORD)"
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - mysql
+                - "-u"
+                - root
+                - "-p$(MYSQL_ROOT_PASSWORD)"
+                - "-e"
+                - "SELECT 1"
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: mysqldb-persistent-storage
+          persistentVolumeClaim:
+            claimName: {{ include "mysqldb.fullname" . }}-pv-claim
+        - name: init-mysqldb-script
+          configMap:
+            name: {{ include "mysqldb.fullname" . }}-init-config

@@ -1,0 +1,31 @@
+persistence:
+  size: 1Gi
+  storageClass: manual
+
+nodeSelector:
+  nodegroup-type: "backend-workloads"
+
+service:
+  type: LoadBalancer
+  port: 8080
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+    service.beta.kubernetes.io/aws-load-balancer-security-groups: "sg-0b6203a7bee35b4dd"
+
+tomcat:
+  image: "tomcat:9.0.96"
+
+database:
+  host: "mysql.example.com"
+  port: "3306"
+  name: "mydb"
+  user: "admin"
+  password: "secretpassword"
+
+env:
+  DB_HOST: "{{ .Values.database.host }}"
+  DB_PORT: "{{ .Values.database.port }}"
+  DB_NAME: "{{ .Values.database.name }}"
+  DB_USER: "{{ .Values.database.user }}"
+  DB_PASSWORD: "{{ .Values.database.password }}"

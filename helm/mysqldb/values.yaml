@@ -1,0 +1,62 @@
+mysql:
+  rootPassword: "root"
+  database: "practice_board"
+  user: "user"
+  password: "userpassword"
+  rootHost: "%"
+
+persistence:
+  size: 1Gi
+  storageClass: manual
+
+nodeSelector:
+  nodegroup-type: "backend-workloads"
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+service:
+  type: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+    service.beta.kubernetes.io/aws-load-balancer-security-groups: "${aws_security_group.PRI-SG.id}"
+
+# Secret values for MySQL database credentials
+secret:
+  username: "user"
+  password: "userpassword"
+
+# Horizontal Pod Autoscaler settings
+hpa:
+  minReplicas: 1
+  maxReplicas: 3
+  cpuUtilization: 80
+
+# Ingress configuration
+ingress:
+  enabled: true
+  host: "mysqldb.example.com"
+  annotations: {}
+  tls: true
+  tlsSecretName: "mysqldb-tls"
+
+# Service Account
+serviceAccount:
+  create: true
+  name: ""
+
+# ConfigMap for MySQL database configurations
+configmap:
+  enabled: true
+  dbProperties: |
+    database.host=localhost
+    database.port=3306
+    database.name=practice_board
+    database.user=user
+    database.password=userpassword

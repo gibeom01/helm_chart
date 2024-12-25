@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tomcatwas.fullname" . }}
+  labels:
+    {{- include "tomcatwas.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "tomcatwas.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "tomcatwas.selectorLabels" . | nindent 8 }}
+    spec:
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.tomcat.image }}
+          env:
+            - name: DB_HOST
+              value: "{{ .Values.database.host }}"
+            - name: DB_PORT
+              value: "{{ .Values.database.port }}"
+            - name: DB_NAME
+              value: "{{ .Values.database.name }}"
+            - name: DB_USER
+              value: "{{ .Values.database.user }}"
+            - name: DB_PASSWORD
+              value: "{{ .Values.database.password }}"
+          volumeMounts:
+            - name: website-content
+              mountPath: /usr/local/tomcat/webapps/index.html
+              subPath: index.html
+            - name: mysql-content
+              mountPath: /usr/local/tomcat/webapps/mysql.jsp
+              subPath: mysql.jsp
+            - name: main-content
+              mountPath: /usr/local/tomcat/webapps/main.html
+              subPath: main.html
+      volumes:
+        - name: website-content
+          configMap:
+            name: {{ include "tomcatwas.fullname" . }}-config
+            items:
+              - key: "index.html"
+                path: "index.html"
+        - name: mysql-content
+          configMap:
+            name: {{ include "tomcatwas.fullname" . }}-config
+            items:
+              - key: "mysql.jsp"
+                path: "mysql.jsp"
+        - name: main-content
+          configMap:
+            name: {{ include "tomcatwas.fullname" . }}-config
+            items:
+              - key: "main.html"
+                path: "main.html"
