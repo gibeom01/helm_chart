@@ -9,6 +9,6 @@ metadata:
     version: "1.0"
 data:
   nginx.conf: |
-    {{ .Values.nginx.config.nginxConf | indent 4 }}
+    {{- .Values.nginx.config.nginxConf | indent 4 }}
   default.conf: |
-    {{ .Values.nginx.config.defaultConf | indent 4 }}
+    {{- .Values.nginx.config.defaultConf | indent 4 }}
