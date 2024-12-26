@@ -4,12 +4,15 @@ metadata:
   name: {{ include "nginxweb.fullname" . }}
   labels:
     {{- include "nginxweb.labels" . | nindent 4 }}
+  {{- if .Values.service.annotations }}
   annotations:
     {{- toYaml .Values.service.annotations | nindent 4 }}
+  {{- end }}
 spec:
-  ports:
-    - port: 80
-      targetPort: 80
-  selector:
-    app: {{ include "nginxweb.name" . }}
   type: {{ .Values.service.type }}
+  selector:
+    {{- include "nginxweb.selectorLabels" . | nindent 4 }}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
