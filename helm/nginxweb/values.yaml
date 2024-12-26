@@ -22,11 +22,17 @@ nginx:
           }
       }
 
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  storageClass: ""
+
 service:
   type: LoadBalancer
   annotations:
     cloud.google.com/load-balancer-type: "Internal"
-    
+
 secret:
   dbPassword: "supersecretpassword"
 
