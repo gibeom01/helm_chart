@@ -6,6 +6,17 @@ nginxweb.fullname 템플릿 정의
 {{- end -}}
 
 {{/*
+nginxweb.labels 템플릿 정의
+*/}}
+{{- define "nginxweb.labels" -}}
+app.kubernetes.io/name: {{ include "nginxweb.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/version: {{ .Chart.AppVersion }}
+app.kubernetes.io/component: nginx
+app.kubernetes.io/part-of: nginxweb
+{{- end -}}
+
+{{/*
 ConfigMap 템플릿
 */}}
 {{- define "nginxweb.configmap" -}}
