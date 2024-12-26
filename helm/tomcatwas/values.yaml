@@ -29,3 +29,8 @@ env:
   DB_NAME: "{{ .Values.database.name }}"
   DB_USER: "{{ .Values.database.user }}"
   DB_PASSWORD: "{{ .Values.database.password }}"
+
+# 추가된 serviceAccount 설정
+serviceAccount:
+  create: true  # ServiceAccount 생성 여부
+  name: "tomcatwas-sa"  # 생성할 ServiceAccount의 이름
