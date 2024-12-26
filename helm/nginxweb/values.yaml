@@ -1,8 +1,10 @@
 nginx:
-  image: nginx:latest
+  image: "nginx:latest"
   config:
     nginxConf: |
-      events {}
+      events {
+        worker_connections 1024;
+      }
       http {
           include       mime.types;
           default_type  application/octet-stream;
@@ -24,9 +26,14 @@ service:
   type: LoadBalancer
   annotations:
     cloud.google.com/load-balancer-type: "Internal"
-
+    
 secret:
   dbPassword: "supersecretpassword"
 
 ingress:
+  enabled: true
   host: "nginxweb.example.com"
+  tls:
+    - secretName: nginxweb-tls-secret
+      hosts:
+        - "nginxweb.example.com"
