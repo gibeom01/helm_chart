@@ -2,7 +2,7 @@
 nginxweb.fullname 템플릿 정의
 */}}
 {{- define "nginxweb.fullname" -}}
-{{- .Release.Name | cat "-" .Chart.Name -}}
+{{ .Release.Name }}-{{ .Chart.Name }}
 {{- end -}}
 
 {{/*
@@ -16,11 +16,19 @@ nginxweb.name 템플릿 정의
 nginxweb.labels 템플릿 정의
 */}}
 {{- define "nginxweb.labels" -}}
-app.kubernetes.io/name: {{ include "nginxweb.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/version: {{ .Chart.AppVersion }}
-app.kubernetes.io/component: nginx
-app.kubernetes.io/part-of: nginxweb
+app.kubernetes.io/name: "{{ include "nginxweb.name" . }}"
+app.kubernetes.io/instance: "{{ .Release.Name }}"
+app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+app.kubernetes.io/component: "nginx"
+app.kubernetes.io/part-of: "nginxweb"
+{{- end -}}
+
+{{/*
+nginxweb.selectorLabels 템플릿 정의 (추가된 부분)
+*/}}
+{{- define "nginxweb.selectorLabels" -}}
+app.kubernetes.io/name: "{{ include "nginxweb.name" . }}"
+app.kubernetes.io/instance: "{{ .Release.Name }}"
 {{- end -}}
 
 {{/*
