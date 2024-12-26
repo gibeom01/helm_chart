@@ -29,4 +29,4 @@ secret:
   dbPassword: "supersecretpassword"
 
 ingress:
-  host: "example.com"
+  host: "nginxweb.example.com"
