@@ -6,6 +6,13 @@ nginxweb.fullname 템플릿 정의
 {{- end -}}
 
 {{/*
+nginxweb.name 템플릿 정의
+*/}}
+{{- define "nginxweb.name" -}}
+{{ .Chart.Name }}
+{{- end -}}
+
+{{/*
 nginxweb.labels 템플릿 정의
 */}}
 {{- define "nginxweb.labels" -}}
