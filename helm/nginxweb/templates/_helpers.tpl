@@ -1,4 +1,11 @@
 {{/*
+nginxweb.fullname 템플릿 정의
+*/}}
+{{- define "nginxweb.fullname" -}}
+{{- .Release.Name | cat "-" .Chart.Name -}}
+{{- end -}}
+
+{{/*
 ConfigMap 템플릿
 */}}
 {{- define "nginxweb.configmap" -}}
